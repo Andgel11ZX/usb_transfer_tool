@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "shared.h": "c",
+        "mainftp.h": "c"
+    }
+}

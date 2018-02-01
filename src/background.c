@@ -5,6 +5,9 @@
 #include "dynamic_libs/os_functions.h"
 #include "system/memory.h"
 
+#include "drcBack.h"
+#include "tvBack.h"
+
 #define TV_WIDTH 1280
 #define DRC_WIDTH 854
 #define TV_HEIGHT 720
@@ -30,8 +33,8 @@ u8 *LoadPicture(char *name, u32 size)
 
 int LoadPictures()
 {
-    picTVBuf = LoadPicture("sd://res/tvBack.tga", TV_WIDTH * TV_HEIGHT * 3 + 18);
-    picDRCBuf = LoadPicture("sd://res/drcBack.tga", DRC_WIDTH * DRC_HEIGHT * 3 + 18);
+    picTVBuf =  tvBack;//LoadPicture("sd://res/tvBack.tga", TV_WIDTH * TV_HEIGHT * 3 + 18);
+    picDRCBuf = drcBack;//LoadPicture("sd://res/drcBack.tga", DRC_WIDTH * DRC_HEIGHT * 3 + 18);
 }
 
 void DrawBackground(int screen)
@@ -46,7 +49,7 @@ void DrawBackground(int screen)
 
     if (buffer == NULL)
         return;
-    //boucle d'affichage de la jaquette
+    
     for (int y = 0; y < SIZES[screen][1]; y++)
     {
         for (int x = 0; x < SIZES[screen][0]; x++)

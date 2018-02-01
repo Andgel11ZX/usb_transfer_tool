@@ -33,6 +33,12 @@ EXPORT_DECL(int, OSDynLoad_Acquire, const char* rpl, u32 *handle);
 EXPORT_DECL(int, OSDynLoad_FindExport, u32 handle, int isdata, const char *symbol, void *address);
 
 //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//! Security functions
+//!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+EXPORT_DECL(int, OSGetSecurityLevel, void);
+EXPORT_DECL(int, OSForceFullRelaunch, void);
+
+//!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //! Thread functions
 //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 EXPORT_DECL(int, OSCreateThread, void *thread, s32 (*callback)(s32, void*), s32 argc, void *args, u32 stack, u32 stack_size, s32 priority, u32 attr);
@@ -58,6 +64,7 @@ EXPORT_DECL(int, OSTryLockMutex, void* mutex);
 //! System functions
 //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 EXPORT_DECL(u64, OSGetTitleID, void);
+EXPORT_DECL(void, DCStoreRange, const void *addr, u32 length);
 EXPORT_DECL(int, OSGetPFID, void);
 EXPORT_DECL(void, OSShutdown, void);
 EXPORT_DECL(void, __Exit, int);
@@ -129,6 +136,12 @@ void InitOSFunctionPointers(void)
 
     OSDynLoad_Acquire("coreinit.rpl", &coreinit_handle);
 
+	
+	//!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //! Security functions
+    //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    OS_FIND_EXPORT(coreinit_handle, OSGetSecurityLevel);
+    OS_FIND_EXPORT(coreinit_handle, OSForceFullRelaunch);
     //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     //! System functions
     //!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -137,6 +150,7 @@ void InitOSFunctionPointers(void)
     OS_FIND_EXPORT(coreinit_handle, OSGetPFID);
     OS_FIND_EXPORT(coreinit_handle, OSSetExceptionCallback);
     OS_FIND_EXPORT(coreinit_handle, DCFlushRange);
+	OS_FIND_EXPORT(coreinit_handle, DCStoreRange);
     OS_FIND_EXPORT(coreinit_handle, DCInvalidateRange);
     OS_FIND_EXPORT(coreinit_handle, ICInvalidateRange);
     OS_FIND_EXPORT(coreinit_handle, OSEffectiveToPhysical);
