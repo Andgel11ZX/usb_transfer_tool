@@ -57,6 +57,8 @@ static char lastFolder[256] = "";
 static char errorText1[128] = "";
 static char errorText2[128] = "";
 static bool folderSelect[1024] = {false};
+static bool deleteAfterInstallation=false;
+static bool deleteChoiceMade=false;
 static bool firstLaunch = true;
 static int update_screen=1;
 static bool installFromNetwork=false;
@@ -223,6 +225,45 @@ static void InstallTitle(void)
     installedTitle = 0;
     installCompleted = 1;
     installError = 0;
+
+    if(!deleteChoiceMade)
+    {
+      
+        OSScreenClearBufferEx(0, 0);
+        OSScreenClearBufferEx(1, 0);
+        DrawBackground(0);
+        DrawBackground(1);
+        OSScreenPutFontEx(0, 0, 13, "Should the titles be removed from the SD after the installation?");
+        OSScreenPutFontEx(1, 0, 9, "Should the titles be removed from the SD after the installation?");
+        OSScreenPutFontEx(0, 0, 14, "A = YES   B = NO");
+        OSScreenPutFontEx(1, 0, 10, "A = YES   B = NO");
+        OSScreenFlipBuffersEx(0);
+        OSScreenFlipBuffersEx(1);
+
+        VPADData vpad_data;
+        int vpadError=0;
+
+        while(!deleteChoiceMade)
+        {
+            VPADRead(0, &vpad_data, 1, &vpadError);
+            u32 pressedBtns = 0;
+        
+            if (!vpadError)
+                pressedBtns = vpad_data.btns_d | vpad_data.btns_h;
+
+            if (pressedBtns & VPAD_BUTTON_A)
+            {
+                deleteAfterInstallation=true;
+                deleteChoiceMade=true;
+            } else if (pressedBtns & VPAD_BUTTON_B)
+            {
+                deleteChoiceMade=true;
+            }
+
+            usleep(5000);
+        }
+        
+    }
 
     __os_snprintf(lastFolder, sizeof(lastFolder), installFolder);
 
@@ -396,6 +437,24 @@ static void InstallTitle(void)
     } while (0);
 
     folderSelect[dirNum] = false;
+
+    if(installSuccess && deleteAfterInstallation)
+    {
+        __os_snprintf(text, sizeof(text), "sd/%s", installFolder);
+        DIR_P *dir = vrt_opendir("/", text);
+        struct dirent *dirent = NULL;
+        while ((dirent = vrt_readdir(dir)) != 0)
+        {
+             __os_snprintf(text, sizeof(text), "sd/%s/%s", installFolder,dirent->d_name);
+            if(dirent->d_name !="." && dirent->d_name !="..")
+                vrt_unlink("/",text);
+        }
+        vrt_closedir(dir);
+        __os_snprintf(text, sizeof(text), "sd/%s", installFolder);
+        vrt_unlink("/",text);
+        RefreshSD();
+    }
+
     if (installSuccess && useFolderSelect())
     {
         dirNum = getNextSelectedFolder();

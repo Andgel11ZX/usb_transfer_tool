@@ -24,7 +24,7 @@
 #include "shared.h"
 
 int IOSUHAX_HANDLE=-1;
-const u16 LOCAL_APP_VERSION=8;
+const u16 LOCAL_APP_VERSION=9;
 u16 REMOTE_APP_VERSION=0;
 u8 REMOTE_APP_VERSION_OFFSET=0;
 
@@ -82,6 +82,7 @@ void Print(char * msg,int line,bool flush)
         DCFlushRange((screenBuffer + screen_buf0_size), screen_buf1_size);
         OSScreenFlipBuffersEx(0);
         OSScreenFlipBuffersEx(1);
+        
     }
 }
 
