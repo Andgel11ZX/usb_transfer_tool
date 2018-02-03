@@ -13,10 +13,8 @@
 #define TV_HEIGHT 720
 #define DRC_HEIGHT 480
 
-const int SIZES[][2] = {{TV_WIDTH, TV_HEIGHT}, {DRC_WIDTH, DRC_HEIGHT}};
+extern int SIZES[][2] = {{TV_WIDTH, TV_HEIGHT}, {DRC_WIDTH, DRC_HEIGHT}};
 
-u8 *picTVBuf = NULL;
-u8 *picDRCBuf = NULL;
 
 u8 *LoadPicture(char *name, u32 size)
 {
@@ -31,10 +29,19 @@ u8 *LoadPicture(char *name, u32 size)
     return buf;
 }
 
-int LoadPictures()
+
+void DrawRectangle(int pos_x, int pos_y, int width, int height, char r,char g, char b, int screen)
 {
-    picTVBuf =  tvBack;//LoadPicture("sd://res/tvBack.tga", TV_WIDTH * TV_HEIGHT * 3 + 18);
-    picDRCBuf = drcBack;//LoadPicture("sd://res/drcBack.tga", DRC_WIDTH * DRC_HEIGHT * 3 + 18);
+
+    uint32_t num = (r << 24) | (g << 16) | (b << 8) | 255;
+
+    for(int x=pos_x;x<pos_x+width;x++)
+    {
+        for(int y=pos_y;y<pos_y+height;y++)
+        {
+             OSScreenPutPixelEx(screen, x, y, num);
+        }
+    }
 }
 
 void DrawBackground(int screen)
@@ -45,7 +52,7 @@ void DrawBackground(int screen)
     const char a = 255;    //alpha ne pas changer la valeur
     unsigned int pos = 18; //saut de l'entete du header TGA
 
-    u8 *buffer = (screen == 0 ? picTVBuf : picDRCBuf);
+    u8 *buffer = (screen == 0 ? tvBack : drcBack);
 
     if (buffer == NULL)
         return;

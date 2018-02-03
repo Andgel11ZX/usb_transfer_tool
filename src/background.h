@@ -11,9 +11,13 @@ extern "C"{
 extern u8 *picTVBuf;
 extern u8 *picDRCBuf;
 
-u8* LoadPicture(char* name, u32 size);
-int LoadPictures();
+extern int SIZES[][2];
 
+u8* LoadPicture(char* name, u32 size);
+
+
+
+void DrawRectangle(int pos_x, int pos_y, int width, int height, char r,char g, char b, int screen);
 void DrawBackground(int screen);
 
 

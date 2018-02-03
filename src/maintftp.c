@@ -225,6 +225,10 @@ static void InstallTitle(void)
     installedTitle = 0;
     installCompleted = 1;
     installError = 0;
+    const int PBAR_MULTIPLICATOR=6;
+    const int PBAR_MAX_VALUE=100;
+    const int PBAR_MAX_WIDTH=PBAR_MULTIPLICATOR*PBAR_MAX_VALUE;
+    const int PBAR_MAX_HEIGHT=50;
 
     if(!deleteChoiceMade)
     {
@@ -372,29 +376,22 @@ static void InstallTitle(void)
                     {
                         OSScreenClearBufferEx(i, 0);
                         DrawBackground(i);
-                        int x, y;
-                        if (i == 0)
-                        {
-                            x = 0;
-                            y = 9;
-                        }
-                        else
-                        {
-                            x = 0;
-                            y = 7;
-                        }
+                        int y=i==0?8:6;
+                      
                         OSScreenPutFontEx(i, 0, 0, TITLE_TEXT);
                         OSScreenPutFontEx(i, 0, 1, TITLE_TEXT2);
-                        OSScreenPutFontEx(i, 0, y, "Installing title...");
-                        OSScreenPutFontEx(i, 0, y + 1, installFolder);
 
-                        __os_snprintf(text, sizeof(text), "%08X%08X - %0.1f / %0.1f MB (%i%%)", titleIdHigh, titleIdLow, installedSize / (1024.0f * 1024.0f),
-                                      totalSize / (1024.0f * 1024.0f), percent);
-                        OSScreenPutFontEx(i, 0, y + 2, text);
+                        __os_snprintf(text, sizeof(text),"Installing %s", installFolder+8);
+                        OSScreenPutFontEx(i, 0,i==0?8:6, text);
 
+                        DrawRectangle(SIZES[i][0]/2-PBAR_MAX_WIDTH/2,SIZES[i][1]/2-PBAR_MAX_HEIGHT/2,PBAR_MAX_WIDTH,PBAR_MAX_HEIGHT,0,0,0,i);
+                        DrawRectangle(SIZES[i][0]/2-PBAR_MAX_WIDTH/2,SIZES[i][1]/2-PBAR_MAX_HEIGHT/2,PBAR_MULTIPLICATOR*percent,PBAR_MAX_HEIGHT,0,151,197,i);
+
+                        __os_snprintf(text, sizeof(text),"%i%", percent);
+                        OSScreenPutFontEx(i,i==0?50:30,i==0?13:8 , text);
                         if (percent == 100)
                         {
-                            OSScreenPutFontEx(i, 0, y + 3, "Please wait...");
+                            OSScreenPutFontEx(i, 0, y + 5, "Please wait...");
                         }
                         // Flip buffers
                         OSScreenFlipBuffersEx(i);
@@ -461,7 +458,9 @@ static void InstallTitle(void)
         doInstall = 1;
     }
     else
+    {
         doInstall = 0;
+    }
 
     MCP_Close(mcpHandle);
     if (mcpPathInfoVector)
@@ -542,29 +541,21 @@ int InitiateWUP(void)
 
                 if (!doInstall)
                 {
-                    int x, y;
-                    if (i == 0)
-                    {
-                        x = 0;
-                        y = 10;
-                    }
-                    else
-                    {
-                        x = 0;
-                        y = 8;
-                    }
-                    OSScreenPutFontEx(i, x, y, "Select a title to install (* = Selected)");
+
+                    int y=i==0?10:8;
+                    
+                    OSScreenPutFontEx(i, 0, y, "Select a title to install (* = Selected)");
                     if(strlen(installFolder)<63+8)
                     {
                         __os_snprintf(text, sizeof(text), "%c  %s", folderSelect[dirNum] ? '*' : ' ', installFolder+8);
-                         OSScreenPutFontEx(i, x, y + 1, text);
+                         OSScreenPutFontEx(i, 0, y + 1, text);
                      }
                      else
                      {
                         __os_snprintf(text, 67, "%c  %s", folderSelect[dirNum] ? '*' : ' ', installFolder+8);
-                         OSScreenPutFontEx(i, x, y + 1, text);
+                         OSScreenPutFontEx(i, 0, y + 1, text);
                          __os_snprintf(text, 160-67, "   %s", installFolder+63+8);
-                         OSScreenPutFontEx(i, x, y + 2, text);
+                         OSScreenPutFontEx(i, 0, y + 2, text);
                      }
                    
                 }
@@ -789,14 +780,13 @@ int Menu_Main_Ftp(void)
 {
 
     MountSd();
-    LoadPictures();
     BroadCastSocket = CreateBroadCastSocket();
     firstLaunch = false;
     if (!doInstall)
         InitiateFTP();
     int exit_code = InitiateWUP();
 
-    cleanup_ftp();
+    CloseFtp();
     if (serverSocket >= 0)
         network_close(serverSocket);
 
@@ -819,8 +809,6 @@ int Menu_Main_Ftp(void)
         unmount_sd_fat("sd");
     }
 
-    //free(picDRCBuf);
-    //free(picTVBuf);
 
     UnmountVirtualPaths();
   

@@ -36,7 +36,7 @@ typedef void (*InstallCallback)(char*);
 void accept_ftp_client(s32 server);
 void set_ftp_password(char *new_password);
 bool process_ftp_events(s32 server);
-void cleanup_ftp();
+void CloseFtp();
 void SetREFRECallBack(RefreshCallback);
 void SetINSTCallBack(InstallCallback);
 

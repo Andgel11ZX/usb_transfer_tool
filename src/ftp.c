@@ -890,7 +890,7 @@ static void cleanup_client(client_t *client)
     //console_printf("Client disconnected.\n");
 }
 
-void cleanup_ftp()
+void CloseFtp()
 {
     int client_index;
     for (client_index = 0; client_index < MAX_CLIENTS; client_index++)
