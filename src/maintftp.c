@@ -28,6 +28,7 @@
 #include "background.h"
 #include "shared.h"
 #include <dirent.h>
+#include "main.h"
 
 
 ///WUP
@@ -89,7 +90,9 @@ static s32 CreateBroadCastSocket()
 
 static void SendBeacon()
 {
-    char *sendString = "HELLO FROM WIIU!";
+
+    char sendString[64];
+    __os_snprintf(sendString, sizeof(sendString), "HELLO FROM WIIU!%i;", LOCAL_APP_VERSION);
     unsigned int sendStringLen = strlen(sendString);
     sendto(BroadCastSocket, sendString, sendStringLen, 0, (struct sockaddr *)&broadcastAddr, sizeof(broadcastAddr));
 }
@@ -215,6 +218,13 @@ static void InstallOrderFromNetwork(char* installpath)
 {
     strcpy(installFolder,installpath);
     installFromNetwork=true;
+}
+
+static void RemoveFromSdFromNetwork(char* choice)
+{
+    deleteChoiceMade=true;
+    deleteAfterInstallation=*choice=='Y';
+    
 }
 
 static void InstallTitle(void)
@@ -715,6 +725,7 @@ void InitiateFTP()
     serverSocket = create_server(21);
     SetREFRECallBack(&RefreshSD);
     SetINSTCallBack(&InstallOrderFromNetwork);
+    SetREMOCallBack(&RemoveFromSdFromNetwork);
 }
 
 //just to be able to call async

@@ -32,6 +32,7 @@ extern "C"{
 
 typedef void (*RefreshCallback)(void);
 typedef void (*InstallCallback)(char*);
+typedef void (*RemoveCallback)(char*);
 
 void accept_ftp_client(s32 server);
 void set_ftp_password(char *new_password);
