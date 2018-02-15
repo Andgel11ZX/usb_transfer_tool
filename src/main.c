@@ -24,7 +24,7 @@
 #include "shared.h"
 
 int IOSUHAX_HANDLE=-1;
-u16 LOCAL_APP_VERSION=11;
+u16 LOCAL_APP_VERSION=12;
 u16 REMOTE_APP_VERSION=0;
 u8 REMOTE_APP_VERSION_OFFSET=0;
 
@@ -200,27 +200,20 @@ int Menu_Main(void)
         unmount_sd_fat("sd");
         UnmountVirtualPaths();
         UnloadScreen();
-        return 0;
+        return EXIT_SUCCESS;
     }
     unmount_sd_fat("sd");
     UnmountVirtualPaths();
-
-
-	int returnCode=0;
+	int returnCode=EXIT_SUCCESS;
     cfw_config_t config;
     default_config(&config);
     IOSUHAX_HANDLE= IOS_Open("/dev/iosuhax", 0);
     if(IOSUHAX_HANDLE<0)
     {
         int res = ExecuteIOSExploit(&config);
-        
-        Print("USB HELPER TRANSFER TOOL",0,false);
-        Print("Mocha applied, please restart the Transfer Tool.",1,false);
-        Print("Will go back to the HBL in 3 seconds...",2,true);
-
-        usleep(3000000);
         UnloadScreen();
-        return 0;
+        SYSRelaunchTitle(0,NULL);
+        return EXIT_RELAUNCH_ON_LOAD;
     }
 	returnCode=Menu_Main_Ftp();
     UnloadScreen();
